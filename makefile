@@ -1,3 +1,5 @@
+# make run FILE=<filename.txt> to run template
+
 FILE?=testcase_1.txt
 compile: template.c
 	gcc template.c -o m

@@ -79,7 +79,19 @@ int find_junctions(Graph* g) {
  * If false, then question 2(b) must be solved.
 */
 bool sheldons_tour(Graph* g, bool SAME_STATION) {
-    
+    int** matrix = g->adj;
+    int odd_count = 0;
+    for(int i = 0; i < g->n; i++){
+        int vertex_edges = 0;
+        for(int j = 0; j < g->n; j++){
+            if(matrix[i][j]) vertex_edges++;
+        }
+        if(vertex_edges%2) odd_count++;
+    }
+    bool ans = false;
+    if(SAME_STATION && (odd_count == 0)) ans = true;
+    if(!SAME_STATION && (odd_count == 2)) ans = true;
+    return ans;
 }
 
 /**
@@ -174,6 +186,13 @@ int main(int argc, char *argv[]) {
     // Code goes here
     // a<i> -> answer of ith question 
     int a1 = find_junctions(g);
-    printf("%d \n", a1);
+    printf("Q1: Number of junctions = %d \n", a1);
+
+    bool a21 = sheldons_tour(g, true);
+    bool a22 = sheldons_tour(g, false);
+
+    printf("Q2: Sheldon's tour (ending in same city as start) = %s \n", a21? "Possible":"Impossible");
+    printf("Q2: Sheldon's tour (ending in different city as start) = %s \n", a22? "Possible":"Impossible");
+
     return 0;
 }
