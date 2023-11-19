@@ -106,6 +106,30 @@ int** warshall(Graph* g) {
     }
 
     // Code goes here
+    int** matrix = g->adj;
+    
+    for(int i = 0; i < g->n; i++){
+        for(int j = 0; j < g->n; j++){
+            closure[i][j] = matrix[i][j];
+        }
+    }
+    
+    for(int i = 0; i < g->n; i++){
+        for(int j = 0; j < g->n; j++){
+            for(int k = 0; k < g->n; k++){
+                if(closure[j][i] && closure[i][k]) closure[j][k] = 1;
+            }
+        }
+    }
+
+    printf("\nTransitive Closure = \n");
+    for(int i = 0; i < g->n; i++){
+        for(int j = 0; j < g->n; j++){
+            printf("%d ", closure[i][j]);
+        }
+        printf("\n");
+    }
+    
     
     return closure; // Do not modify
 }
@@ -116,7 +140,13 @@ int** warshall(Graph* g) {
 */
 int find_impossible_pairs(Graph* g) {
     int** closure = warshall(g); // Do not modify
-    
+    int count = 0;
+    for(int i = 0; i < g->n; i++){
+        for(int j = 0; j < g->n; j++){
+            if(closure[i][j]==0 && i!=j) count++;
+        }
+    }
+    return count/2;
 }
 
 /**
@@ -186,13 +216,17 @@ int main(int argc, char *argv[]) {
     // Code goes here
     // a<i> -> answer of ith question 
     int a1 = find_junctions(g);
-    printf("Q1: Number of junctions = %d \n", a1);
+    printf("Q1: Number of junctions = %d \n\n", a1);
 
     bool a21 = sheldons_tour(g, true);
     bool a22 = sheldons_tour(g, false);
 
-    printf("Q2: Sheldon's tour (ending in same city as start) = %s \n", a21? "Possible":"Impossible");
-    printf("Q2: Sheldon's tour (ending in different city as start) = %s \n", a22? "Possible":"Impossible");
+    printf("Q2a: Sheldon's tour (ending in same city as start) = %s \n\n", a21? "Possible":"Impossible");
+    printf("Q2b: Sheldon's tour (ending in different city as start) = %s \n\n", a22? "Possible":"Impossible");
+
+    int a3 = find_impossible_pairs(g);
+    //maybe implement a check to find if graph is connected
+    printf("Q3: Impossible to travel city pairs = %d \n\n", a3);
 
     return 0;
 }
