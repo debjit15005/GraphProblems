@@ -165,8 +165,8 @@ int find_vital_train_tracks(Graph* g) {
                 matrix[u][v] = 0; // Disconnect the edge from u to v
                 matrix[v][u] = 0;
 
-                int** tempWarshall = warshall(g);
-                if(tempWarshall[u][v] == 0) count++; // No way to go from u to v => it is a bridge
+                int dist = distance(g, u, v);
+                if(dist == -1) count++; // No way to go from u to v => it is a bridge
 
                 matrix[u][v] = temp;
                 matrix[v][u] = temp;
@@ -343,6 +343,9 @@ int main(int argc, char *argv[]) {
     int a3 = find_impossible_pairs(g);
     //maybe implement a check to find if graph is connected
     printf("Q3: Impossible to travel city pairs = %d \n\n", a3);
+
+    int a4 = find_vital_train_tracks(g);
+    printf("xxxxxxxxxxxxx %d\n", a4);
 
     return 0;
 }
