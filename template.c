@@ -154,7 +154,26 @@ int find_impossible_pairs(Graph* g) {
  * Return the number of vital train tracks.
 */
 int find_vital_train_tracks(Graph* g) {
-    
+    int N = g->n;
+    int** matrix = g->adj;
+    int count = 0;
+
+    for(int u = 0; u<N; u++){
+        for(int v = u; v<N; v++){
+            if(matrix[u][v] != 0){
+                int temp = matrix[u][v];
+                matrix[u][v] = 0; // Disconnect the edge from u to v
+                matrix[v][u] = 0;
+
+                int** tempWarshall = warshall(g);
+                if(tempWarshall[u][v] == 0) count++; // No way to go from u to v => it is a bridge
+
+                matrix[u][v] = temp;
+                matrix[v][u] = temp;
+            }
+        }
+    }
+    return count;
 }
 
 /**
@@ -166,9 +185,42 @@ int find_vital_train_tracks(Graph* g) {
 */
 int* upgrade_railway_stations(Graph* g) {
     int* upgrades = calloc(g->n, sizeof(int)); // Do not modify
-    
     // Code goes here
 
+    int N = g->n;
+    int** matrix = g->adj;
+
+    for(int i = 0; i<N; i++) upgrades[i] = -99;
+
+    // 0 --> Complete Restaurant
+    // 1 --> Complete Depot
+    
+    // 2 --> Incomplete Restaurant i.e not all neighbours explored
+    // 3 --> Incomplete Depot i.e not all neighbours explored
+
+    int possible_flag = 1;
+    upgrades[0] = 2; // Make the starting node an incomplete restaurant
+    for(int i = 0; i<N && possible_flag; i++){
+        if(upgrades[i] == 2 || upgrades[i] == 3){
+
+            upgrades[i] %= 2; // Now we have made this node complete
+
+            for(int j = 0; j<N; j++){
+                if(matrix[i][j] && upgrades[j] == -99){
+                    upgrades[j] = ((upgrades[i]+1)%2)+2; // Make the neighbour an incomplete depot/restaurant
+                }
+                else if(matrix[i][j] && (upgrades[j] == upgrades[i] || upgrades[j] == upgrades[i]+2)){
+                    possible_flag = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    if(!possible_flag){
+        for(int i = 0; i<N; i++) upgrades[i] = -1;
+    }
+    
     return upgrades; // Do not modify
 }
 
