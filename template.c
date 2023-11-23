@@ -178,7 +178,37 @@ int* upgrade_railway_stations(Graph* g) {
  * city_x is the index of X, city_y is the index of Y
 */
 int distance(Graph* g, int city_x, int city_y) {
-    
+	if(city_x==city_y)
+		return 0;
+	int* vis = (int*)malloc(g->n * sizeof(int)); 
+    for(int i=0;i<g->n;i++)
+		vis[i]=0;
+	vis[city_x]=1;
+	int temp = 2;
+	while(true)
+	{
+		for(int i=0;i<g->n;i++)	
+		{
+			if(vis[i]==temp-1)
+			{
+				for(int j=0;j<g->n;j++)
+				{
+					if(g->adj[i][j]==1 && vis[j]==0)
+						vis[j]=temp;
+				}
+			}
+		}
+		if(vis[city_y]!=0)
+			return temp-1;
+		int check = 0;
+		for(int i=0;i<g->n;i++)
+			if(vis[i]==temp)
+				check=1;
+		if(check==0)
+			break;
+		temp++;
+	}
+	return -1;	
 }
 
 /**
@@ -186,14 +216,42 @@ int distance(Graph* g, int city_x, int city_y) {
  * Return the index of any one possible railway capital in the network
 */
 int railway_capital(Graph* g) {
-    
+    int ans=0;
+    int dis=0;
+    for(int i=1;i<g->n;i++)
+        dis+=(distance(g,0,i));
+    for(int i=1;i<g->n;i++)
+    {
+        int temp=0;
+        for(int j=0;j<g->n;j++)
+        {
+            temp+=(distance(g,i,j));
+        }
+        if(temp<dis)
+        {
+            dis=temp;
+            ans=i;
+        }
+    }
+    return ans;
 }
 
 /**
  * Helper function for Q.8
 */
 bool maharaja_express_tour(Graph* g, int source, int current_city, int previous_city, int* visited) {
-    
+    if(current_city==source)
+        return true;
+    visited[current_city]=1;
+    for(int i=0;i<g->n;i++)
+    {
+        if(i!=previous_city && g->adj[current_city][i]==1 && visited[i]!=1)
+        {
+            if(maharaja_express_tour(g,source,i,current_city,visited))
+                return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -206,6 +264,12 @@ bool maharaja_express(Graph* g, int source) {
     for(int i = 0; i < g->n; i++) {
         visited[i] = 0;
     }
+    for(int i=0;i<g->n;i++)
+    {
+        if(g->adj[source][i]==1 && visited[i]==0 && maharaja_express_tour(g,source,i,source,visited)==true)
+            return true;
+    }
+    return false;
     // Hint: Call the helper function and pass the visited array created here.
 }
 
